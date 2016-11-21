@@ -41,7 +41,7 @@ volatile char * pinD = (char *) 0x29; // le
 volatile char * portD = (char *) 0x2B; // grava
 
 
-
+// OK WORKING
 void configPort( char portNum, char mode )
 {
 	if (mode == INPUT) // 0
@@ -60,6 +60,7 @@ void configPort( char portNum, char mode )
 	}
 }
 
+// OK WORKING
 void setPortState(char portNum, char state)
 {
 	if (state == LOW)
@@ -79,6 +80,7 @@ void setPortState(char portNum, char state)
 }
 
 
+// OK WORKING
 char getPortState(char portNum)
 {
 	char state = -1;
@@ -96,6 +98,7 @@ char getPortState(char portNum)
 	}
 }
 
+// OK WORKING
 void configInt0() // PORT02 ,, quick config
 {
 	cli();

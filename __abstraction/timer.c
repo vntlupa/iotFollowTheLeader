@@ -90,7 +90,7 @@ void setTimerMode(char timerNum, char mode)
 
 
 // USE THIS BELOW -- quick config
-
+// OK WORKING
 void setTimer1pre256( int hz)
 {
 	cli();
