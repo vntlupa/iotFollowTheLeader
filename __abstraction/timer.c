@@ -88,6 +88,8 @@ void setTimerMode(char timerNum, char mode)
 		TIMSK1 = (1 << TOIE1);
 }
 
+-----------------------------
+
 
 // USE THIS BELOW -- quick config
 // OK WORKING
@@ -102,4 +104,47 @@ void setTimer1pre256( int hz)
 	TIMSK1 |= (1 << TOIE1);   // enable timer overflow interrupt	
 	//use --> ISR(TIMER1_OVF_vect) 
 	sei();
+}
+
+
+// OK WORKING
+void setTimer1ForMillis()
+{
+  	cli();
+	//initialize timer
+	// Enter Watchdog Configuration mode:
+    TCCR1A = 0;
+    TCCR1B = 0;
+    TCNT1  = 0;
+
+    OCR1A = 64;            // compare match register 16MHz/256 -> 64 ->1024 microsegundos
+    TCCR1B |= (1 << WGM12);   // CTC mode
+    TCCR1B |= (1 << CS12);    // 256 prescaler 
+    TIMSK1 |= (1 << OCIE1A);  // enable timer compare interrupt
+
+    milliseconds = 0;
+    microseconds = 0;
+	//Enable global interrupts
+	sei();
+
+/*
+	funcao para calcular os millis,, nao testei ainda,, mas teoricamente estah funcionando:
+
+volatile unsigned long milliseconds;
+volatile unsigned int microseconds;
+
+ISR(TIMER1_COMPA_vect)
+{
+  microseconds += 24 - 1;
+  milliseconds += 1;
+  
+  if (microseconds >= 1000) 
+  {
+    microseconds -= 1000;
+    milliseconds += 1;
+  }
+  
+}	
+
+*/
 }
