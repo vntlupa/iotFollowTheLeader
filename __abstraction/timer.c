@@ -92,18 +92,54 @@ void setTimerMode(char timerNum, char mode)
 
 
 // USE THIS BELOW -- quick config
-// OK WORKING
-void setTimer1pre256( int hz)
+// OK WORKING -- testar com o restante dos trecos de timer
+-->   TIMER COM MYMIlLIS
 {
-	cli();
-	TCCR1A = 0;
-	TCCR1B = 0;
-	//TCNT1 = 34286;            // preload timer 65536-16MHz/256/2Hz
-	TCNT1 = 65536 - (62500 / hz) ;
-	TCCR1B |= (1 << CS12);    // 256 prescaler 
-	TIMSK1 |= (1 << TOIE1);   // enable timer overflow interrupt	
-	//use --> ISR(TIMER1_OVF_vect) 
-	sei();
+	
+	volatile unsigned long myMicros = 0;
+	volatile unsigned long myMillis = 0;
+	void setTimer1pre256( int hz)
+	{
+		cli();
+		TCCR1A = 0;
+		TCCR1B = 0;
+		//TCNT1 = 34286;            // preload timer 65536-(16MHz/256/2Hz)
+		TCNT1 = 65536 - (62500 / hz) ;
+		TCCR1B |= (1 << CS12);    // 256 prescaler 
+		TIMSK1 |= (1 << TOIE1);   // enable timer overflow interrupt	
+		//use --> ISR(TIMER1_OVF_vect) 
+		sei();
+	}
+	
+	ISR (TIMER1_OVF_vect) 	
+	{
+		//for 256 prescale each tick means: 3 milliSec + 906.25 microSec
+		// for all 256 ticks --> 999 millisec + 936 microsec --> possivel corrigir a precisao
+		myMicros += 936;
+		if (myMicros >= 1000)
+		{
+			myMicros -= 1000;
+			myMillis += 999 + 1;
+		}
+		else
+		{
+			myMillis += 999;
+		}
+		TCNT1 = 65536-62500;
+	}
+	
+	unsigned long getMillis()
+	{
+		unsigned long ticks = TCNT1 ; // preload timer 65536-16MHz/256
+		unsigned long elapsedFromReg = (ticks * 906 + (ticks * 3 * 1000) ) / 1000;
+		return myMillis + elapsedFromReg;
+	}
+	
+	void myDelayMillis(unsigned long delayMillis)
+	{
+		unsigned long endMilli = delayMillis + getMillis();
+		while (getMillis() < endMilli);
+	}
 }
 
 
