@@ -125,13 +125,15 @@ void setTimerMode(char timerNum, char mode)
 		{
 			myMillis += 999;
 		}
-		TCNT1 = 65536-62500;
+     
+      TCNT1 = 65536-62500;
+
 	}
 	
 	unsigned long getMillis()
 	{
-		unsigned long ticks = TCNT1 ; // preload timer 65536-16MHz/256
-		unsigned long elapsedFromReg = (ticks * 906 + (ticks * 3 * 1000) ) / 1000;
+		unsigned long ticks = TCNT1/256 ; // preload timer 65536-16MHz/256
+		unsigned long elapsedFromReg = (ticks * 3906 ) / 1000;
 		return myMillis + elapsedFromReg;
 	}
 	
